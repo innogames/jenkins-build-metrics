@@ -36,8 +36,8 @@ func main() {
 
 	flag.Parse()
 
-	if user == "" || token == "" || prefix == "" {
-		fmt.Println("Please specify jenkins user, token and prefix")
+	if user == "" || token == "" || prefix == "" || server == "" {
+		fmt.Println("Please specify jenkins user (-u), token (-t), server (-s) and prefix (-p)")
 		os.Exit(1)
 	}
 
@@ -51,7 +51,8 @@ func main() {
 
 	response, err := http.Get(fmt.Sprintf("https://%s:%s@%s/api/json", user, token, server))
 	if err != nil {
-		fmt.Println("Failed to download json from https://", server, "/api/json")
+		fmt.Printf("Failed to download json from https://%s/api/json\n", server)
+		os.Exit(1)
 	}
 	defer response.Body.Close()
 
