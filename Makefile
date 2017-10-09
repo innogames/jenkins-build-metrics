@@ -1,9 +1,12 @@
+BINARY := bin/jenkins-build-metrics
+SOURCE := main.go
+
 .PHONY: all clean
 
-all: server
+all: $(BINARY)
 
-server:
-	go build -o bin/jenkins-build-metrics main.go
+$(BINARY): $(SOURCE)
+	CGO_ENABLED=0 go build -o $@ $<
 
-server\:linux: init
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -ldflags '-s' -o bin/jenkins-build-metrics main.go
+clean:
+	rm $(BINARY)
