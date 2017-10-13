@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 	"time"
+	"regexp"
 )
 
 type job struct {
@@ -25,16 +26,23 @@ type jenkinsBuildResponse struct {
 }
 
 func main() {
-	var user, token, server, prefix, graphiteHost string
+	var user, token, server, prefix, filter, graphiteHost string
 	var graphitePort int
 	flag.StringVar(&user, "u", "", "one of the configured jenkins user")
 	flag.StringVar(&token, "t", "", "one of the configured jenkins users token")
 	flag.StringVar(&server, "s", "", "the actual jenkins server")
 	flag.StringVar(&prefix, "p", "", "prefix to use for graphite. e.g., backend.marketing.jenkins")
+	flag.StringVar(&filter, "f", ".*", "regular expression to filter by job names")
 	flag.IntVar(&graphitePort, "gp", 3002, "the port to use to talk to graphite")
 	flag.StringVar(&graphiteHost, "gh", "127.0.0.1", "the server address to use to talk to graphite")
 
 	flag.Parse()
+
+	filterRE, err := regexp.Compile(filter)
+	if err != nil {
+		fmt.Printf("Invalid filter expression: %s\n", err)
+		os.Exit(1)
+	}
 
 	if user == "" || token == "" || prefix == "" || server == "" {
 		fmt.Println("Please specify jenkins user (-u), token (-t), server (-s) and prefix (-p)")
@@ -67,6 +75,10 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	for _, currentJob := range jobs.Jobs {
+		if !filterRE.MatchString(currentJob.Name) {
+			continue
+		}
+
 		wg.Add(1)
 		go func(name string) {
 			defer wg.Done()

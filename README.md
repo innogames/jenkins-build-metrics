@@ -21,7 +21,7 @@ Running The Tool
 ----------------
 
 ```
-jenkins-build-metrics -u user -t token -s jenkins.example.com
+jenkins-build-metrics -u user -t token -p some.prefix -s jenkins.example.com -f "-test$"
 ```
 
 Arguments
@@ -31,6 +31,6 @@ Arguments
 * `-t` the users token, this is not the password
 * `-s` the host name of the jenkins server
 * `-p` the prefix for the graphite metric: default is `backend.marketing.jenkins`
+* `-f` a filter pattern (regular expression)
 * `-gp` the port for your graphite metrics gateway: default `3002`
 * `-gh` the host name of your graphite metrics gateway: default `127.0.0.1`
-
